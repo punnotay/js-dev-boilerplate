@@ -1,6 +1,27 @@
 import './style.css';
-import numeral from 'numeral';
+import { getUsers, deleteUser } from './api/userApi';
 
-const val = numeral(1000).format('$0,0.00');
-//debugger;
-console.log(`Course value costs ${val}!!`); // eslint-disable-line no-console
+getUsers().then(result => {
+  var usersBody = '';
+  result.forEach(user => {
+    usersBody += `<tr>
+      <td><a href="#" data-id=${user.id} class="deleteUser">Delete</td>
+      <td>${user.id}</td>
+      <td>${user.firstName} ${user.lastName}</td>
+      <td>${user.email}</td>
+      </tr>`
+   });
+   global.document.getElementById('users').innerHTML = usersBody;
+
+   const delLinks = global.document.getElementByClassName('deleteUser');
+
+   Array.from(delLinks, link => {
+     link.onClick = (event) => {
+       const elem = event.target;
+       event.preventDefault();
+       deleteUser(elem.attributes['data-id'].value);
+       const row = elem.parentNode.parentNode;
+       row.parentNode.removeChild(row);
+     };
+   });
+});
